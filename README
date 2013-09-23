@@ -1,0 +1,58 @@
+NAME
+    WebService::PayPal::NVP - PayPal NVP API
+
+DESCRIPTION
+    This module is the result of a desperate attempt to save instances of
+    Business::PayPal::NVP. It didn't seem to work inside accessors or
+    Catalyst Adaptors. Although the module worked, this was a major drawback
+    for me. So I re-engineered it using the lovely Moo.
+
+SYNTAX
+        my $nvp = WebService::PayPal::NVP->new(
+            user   => 'user.tld'
+            pwd    => 'xxx',
+            sig    => 'xxxxxxx',
+            branch => 'sandbox',
+        );
+    
+        my $res = $nvp->set_express_checkout({
+            DESC              => 'Payment for something cool',
+            AMT               => 25.00,
+            CURRENCYCODE      => 'GBP',
+            PAYMENTACTION     => 'Sale',
+            RETURNURL         => "http://returnurl.tld",
+            CANCELURL         => 'http//cancelurl.tld",
+            LANDINGPAGE       => 'Login',
+            ADDOVERRIDE       => 1,
+            SHIPTONAME        => "Customer Name",
+            SHIPTOSTREET      => "7 Customer Street", 
+            SHIPTOSTREET2     => "", 
+            SHIPTOCITY        => "Town", 
+            SHIPTOZIP         => "Postcode", 
+            SHIPTOEMAIL       => "customer\@example.com", 
+            SHIPTOCOUNTRYCODE => 'GB',
+        });
+    
+        if ($res->success) {
+            # timestamps turned into DateTime objects
+            say "Response received at "
+                . $res->timestamp->dmy . " "
+                . $res->timestamp->hms(':');
+
+            for my $arg ($res->args) {
+                if ($res->has_arg($arg)) {
+                    say "$arg => " . $res->$arg;
+                }
+            }
+        }
+        else {
+            say $_
+              for @{$res->errors};
+        }
+
+AUTHOR
+    Brad Haywood <brad@geeksware.com>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+
